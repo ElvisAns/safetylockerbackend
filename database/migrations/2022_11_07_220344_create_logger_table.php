@@ -13,10 +13,10 @@ class CreateLinesStateTable extends Migration
      */
     public function up()
     {
-        Schema::create('lines_state', function (Blueprint $table) {
+        Schema::create('action_logs', function (Blueprint $table) {
             $table->id();
             $table->string("type");
-            $table->string("action");
+            $table->string("info");
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreateLinesStateTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lines_state');
+        Schema::dropIfExists('action_logs');
     }
 }
