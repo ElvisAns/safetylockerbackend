@@ -2,6 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ActionLogsController;
+use App\Http\Controllers\SecurityLockingCodeController;
+use App\Http\Controllers\LinesStatesController;
+use App\Models\SecurityLockingCode;
+use App\Models\LinesStates;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,36 +24,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/lines/{line_id?}',function ($line_id=null){
-    if($line_id){
-        //return state of the current line
-    }
-    //return state of all lines
-});
 
-Route::post('/lines/{line_id}/{state}',function($line_id,$state){
-    //Requires the current password in the request
-    //put a given line in a given state (on and off)
-    //each action should put something in the log
-});
-
-Route::post('/lines/maintenance/{state}',function($state){
-    //start or stop maintence maintenance
-    //Require current password
-    //each action should put something in the log
-});
-
-Route::get('/auth/password/forgotten',function(){
-    //send email to admin with the current password to unclock maintenance mode
-    //each action should put something in the log
-});
-
-Route::post('/auth/password/get_new',function(){
-    //get new password from the backend
-    //must submit the old password though post
-    //each action should put something in the log
-});
-
-Route::get('/lines/logs',function(){
-    //get list of logs and timestamp per entry
-});
+Route::get('/lines',[LinesStatesController::class,'get_all']);
+Route::post('/lines/state/set/{line_id}',[LinesStatesController::class,'change_line_state']);
+Route::get('/lines/state/{line_id}',[LinesStatesController::class,'get_line_state']);
+Route::post('/lines/maintenance/{option}',[LinesStatesController::class,'switch_on_or_off_maintance']);
+Route::post('/lines',[LinesStatesController::class,'create_line']);
+Route::get('/auth/password/forgotten',[SecurityLockingCodeController::class,'password_forgotten']);
+Route::post('/auth/password/get_new',[SecurityLockingCodeController::class,'get_new']);
+Route::get('/lines/logs/list',[ActionLogsController::class,'get_all']);
+Route::post('/lines/logs',[ActionLogsController::class,'save']);
