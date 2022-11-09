@@ -17,7 +17,6 @@ class CreateLineStatesTable extends Migration
             $table->id();
             $table->string('line_name');
             $table->boolean('state');
-            $table->string('updated_at');
             $table->timestamps();
         });
     }

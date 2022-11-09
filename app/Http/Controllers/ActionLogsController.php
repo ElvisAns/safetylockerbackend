@@ -19,11 +19,12 @@ class ActionLogsController extends Controller
             return ['message'=>"logs saved with success"];
         }
         catch(\Exception $e){
-            return ['error'=>'true','message'=>'Error inserting the log information'];
+            return ['error'=>true,'message'=>'Error inserting the log information'];
         }
     }
 
     public function get_all(){
-        return ActionLogs::all();
+        $res = ActionLogs::all();
+        return ['data'=>$res];
     }
 }
