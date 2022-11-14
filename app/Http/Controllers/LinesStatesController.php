@@ -81,4 +81,12 @@ class LinesStatesController extends Controller
 
         return ['message'=>"The system mode has switched to maintance: $maintance and all the lines are ON"];
     }
+
+    function get_status(){
+        $logs = ActionLogs::where("type","System maintance")->latest()->first();
+        if(preg_match('/OFF/',$logs->info)){
+            return ['message'=>"Running"];
+        }
+        return ['message'=>"Under maintenance"];
+    }
 }

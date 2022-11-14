@@ -34,3 +34,4 @@ Route::get('/auth/password/forgotten',[SecurityLockingCodeController::class,'pas
 Route::post('/auth/password/get_new',[SecurityLockingCodeController::class,'get_new']);
 Route::get('/lines/logs/list',[ActionLogsController::class,'get_all']);
 Route::post('/lines/logs',[ActionLogsController::class,'save']);
+Route::get('/current_status',[LinesStatesController::class,'get_status']);
