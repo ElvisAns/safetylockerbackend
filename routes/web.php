@@ -14,5 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return ["running"=>"yes :-)","where?"=>"As api service! find more at https://github.com/ElvisAns/safetylockerbackend"];
+    //return view('welcome');
 });
