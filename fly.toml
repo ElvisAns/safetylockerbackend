@@ -26,7 +26,7 @@ processes = []
   auto_rollback = true
   
 [deploy]
-  release_command = "php /var/www/html/artisan migrate"
+  release_command = "php /var/www/html/artisan optimize"
 
 [[services]]
   http_checks = []
