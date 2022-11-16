@@ -18,6 +18,8 @@ processes = []
   DB_CONNECTION="mysql"
   DB_HOST="sql.freedb.tech"
   DB_PORT=3306
+  EMAIL_ADDRESS_OWNER="ansimapersic@gmail.com"
+  EMAIL_ADDRESS_ADMIN="ansimapersic@gmail.com"
 
 [experimental]
   allowed_public_ports = []
