@@ -29,7 +29,7 @@ class SecurityLockingCodeController extends Controller
         $mail2 = env("EMAIL_ADDRESS_OWNER");
         
         $email =new \SendGrid\Mail\Mail(); 
-        $email->setFrom("ansimapersic@gmail.com", "Elvis");
+        $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
         $email->setSubject("YOUR PIN SAFETY LOCKER PIN");
         $email->addTo($mail2, "Admin User");
         //$email->addTo($mail1, "Root User");
@@ -50,7 +50,7 @@ class SecurityLockingCodeController extends Controller
                 </p>
             </p>"
         );
-        $sendgrid = new \SendGrid(env('SENDGRID_API_KEY'));
+        $sendgrid = new \SendGrid(env('SENDGRID_API_KEY_FULL'));
         try {
             $response = $sendgrid->send($email);
             http_response_code($response->statusCode());
