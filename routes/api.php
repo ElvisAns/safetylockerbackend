@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
+Route::get('/iot/sync',[LinesStatesController::class,'get_min']);
 Route::get('/lines',[LinesStatesController::class,'get_all']);
 Route::post('/lines/state/set/{line_id}',[LinesStatesController::class,'change_line_state']);
 Route::get('/lines/state/{line_id}',[LinesStatesController::class,'get_line_state']);

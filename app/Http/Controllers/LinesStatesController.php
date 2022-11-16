@@ -27,6 +27,10 @@ class LinesStatesController extends Controller
         return LinesStates::get()->all();
     }
 
+    function get_min(){
+        return LinesStates::get(['state','connected_pin'])->all();
+    }
+
     function get_line_state($line_id){
         $line = LinesStates::findOrFail($line_id);
         return $line;
