@@ -24,7 +24,7 @@ class ActionLogsController extends Controller
     }
 
     public function get_all(){
-        $res = ActionLogs::all();
+        $res = ActionLogs::latest()->limit(5)->get();
         return ['data'=>$res];
     }
 }
