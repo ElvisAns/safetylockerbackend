@@ -28,7 +28,13 @@ class LinesStatesController extends Controller
     }
 
     function get_min(){
-        return LinesStates::get(['state','connected_pin'])->all();
+        $datas  = LinesStates::get(['state','connected_pin'])->all();
+        $logs = ActionLogs::where("type","System maintance")->latest()->first();
+        if(preg_match('/OFF/',$logs->info)){
+            array_push($datas,['state'=>1,'connected_pin'=>'Gl']);
+        }
+        else array_push($datas,['state'=>0,'connected_pin'=>'Gl']);
+        return $datas;
     }
 
     function get_line_state($line_id){
