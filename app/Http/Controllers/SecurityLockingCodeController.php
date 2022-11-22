@@ -32,7 +32,7 @@ class SecurityLockingCodeController extends Controller
         $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
         $email->setSubject("YOUR PIN SAFETY LOCKER PIN");
         $email->addTo($mail2, "Admin User");
-        //$email->addTo($mail1, "Root User");
+        $email->addTo($mail1, "Root User");
         $email->addContent(
             "text/html", 
             "<p style='line-height:1.6; font-family: Arial, Helvetica, sans-serif;'>
