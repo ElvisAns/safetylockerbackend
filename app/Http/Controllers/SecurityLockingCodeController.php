@@ -54,7 +54,7 @@ class SecurityLockingCodeController extends Controller
         try {
             $response = $sendgrid->send($email);
             http_response_code($response->statusCode());
-            return ["message"=>"Success, the current pin has been sent to $mail2"];
+            return ["message"=>"Success, the current pin has been sent to $mail1"];
         } catch (\Exception $e) {
             http_response_code(400);
             Log::error('Caught exception: '. $e->getMessage());
