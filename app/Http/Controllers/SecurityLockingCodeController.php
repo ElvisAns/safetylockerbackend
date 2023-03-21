@@ -25,14 +25,14 @@ class SecurityLockingCodeController extends Controller
 
     public function password_forgotten(){
         $pin = SecurityLockingCode::get()->first();
-        $mail1 = env("EMAIL_ADDRESS_ADMIN");
-        //$mail2 = env("EMAIL_ADDRESS_OWNER");
+        //$mail1 = env("EMAIL_ADDRESS_ADMIN");
+        $mail2 = env("EMAIL_ADDRESS_OWNER");
         
         $email =new \SendGrid\Mail\Mail(); 
         $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
         $email->setSubject("YOUR PIN SAFETY LOCKER PIN");
-        //$email->addTo($mail2, "Admin User");
-        $email->addTo($mail1, "Root User");
+        $email->addTo($mail2, "Admin User");
+        //$email->addTo($mail1, "Root User");
         $email->addContent(
             "text/html", 
             "<p style='line-height:1.6; font-family: Arial, Helvetica, sans-serif;'>
@@ -54,7 +54,7 @@ class SecurityLockingCodeController extends Controller
         try {
             $response = $sendgrid->send($email);
             http_response_code($response->statusCode());
-            return ["message"=>"Success, the current pin has been sent to $mail1"];
+            return ["message"=>"Success, the current pin has been sent to $mail2"];
         } catch (\Exception $e) {
             http_response_code(400);
             Log::error('Caught exception: '. $e->getMessage());
