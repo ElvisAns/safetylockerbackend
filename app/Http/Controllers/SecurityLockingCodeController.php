@@ -26,12 +26,12 @@ class SecurityLockingCodeController extends Controller
     public function password_forgotten(){
         $pin = SecurityLockingCode::get()->first();
         $mail1 = env("EMAIL_ADDRESS_ADMIN");
-        $mail2 = env("EMAIL_ADDRESS_OWNER");
+        //$mail2 = env("EMAIL_ADDRESS_OWNER");
         
         $email =new \SendGrid\Mail\Mail(); 
         $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
         $email->setSubject("YOUR PIN SAFETY LOCKER PIN");
-        $email->addTo($mail2, "Admin User");
+        //$email->addTo($mail2, "Admin User");
         $email->addTo($mail1, "Root User");
         $email->addContent(
             "text/html", 
@@ -46,7 +46,7 @@ class SecurityLockingCodeController extends Controller
                 </p>
                 <hr>
                 <p style='text-align:center; padding:30px; color:darkblue;'>
-                    Security locker | by Elvis@perfecto-group
+                    Security locker | by Elvis@
                 </p>
             </p>"
         );
