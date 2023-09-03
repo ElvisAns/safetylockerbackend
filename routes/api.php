@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActionLogsController;
 use App\Http\Controllers\SecurityLockingCodeController;
 use App\Http\Controllers\LinesStatesController;
+use App\Http\Controllers\CattleLogsController;
 use App\Models\SecurityLockingCode;
 use App\Models\LinesStates;
 
@@ -36,3 +37,5 @@ Route::post('/auth/password/get_new',[SecurityLockingCodeController::class,'get_
 Route::get('/lines/logs/list',[ActionLogsController::class,'get_all']);
 Route::post('/lines/logs',[ActionLogsController::class,'save']);
 Route::get('/current_status',[LinesStatesController::class,'get_status']);
+Route::get('/cattle',[CattleLogsController::class, 'index']);
+Route::post('/cattle',[CattleLogsController::class, 'store']);
