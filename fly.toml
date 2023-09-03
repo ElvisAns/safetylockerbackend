@@ -24,9 +24,6 @@ processes = []
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
-  
-[deploy]
-  release_command = "php /var/www/html/artisan optimize"
 
 [[services]]
   http_checks = []
