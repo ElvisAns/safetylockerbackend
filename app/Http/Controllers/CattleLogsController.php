@@ -15,10 +15,9 @@ class CattleLogsController extends Controller
         $device_uuid = $request->cookie('X-device-uuid');
         if (!$device_uuid) {
             $device_uuid = (string) Str::uuid();
-            return response(CattleStateLogs::orderBy('created_at', 'desc')->select('created_at', 'json_data')->get())->cookie('X-device-uuid', $device_uuid, 5256000);
+            return response(CattleStateLogs::orderBy('created_at', 'desc')->get(['created_at', 'json_data']))->cookie('X-device-uuid', $device_uuid, 5256000);
         }
-        $not_sent_logs = CattleStateLogs::whereJsonDoesntContain('seen_by', $device_uuid)->orderBy('created_at', 'desc')
-                        ->limit(10)->select('created_at', 'json_data')->get();
+        $not_sent_logs = CattleStateLogs::whereJsonDoesntContain('seen_by', $device_uuid)->orderBy('created_at', 'desc')->limit(10)->get(['created_at', 'json_data']);
         return response($not_sent_logs);
     }
 
