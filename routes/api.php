@@ -39,3 +39,4 @@ Route::post('/lines/logs',[ActionLogsController::class,'save']);
 Route::get('/current_status',[LinesStatesController::class,'get_status']);
 Route::get('/cattle',[CattleLogsController::class, 'index']);
 Route::post('/cattle',[CattleLogsController::class, 'store']);
+Route::get('/cattle/log/confirm',[CattleLogsController::class, 'confirm']);

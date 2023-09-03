@@ -16,8 +16,8 @@ class CreateCattleStateLogsTable extends Migration
         Schema::create('cattle_state_logs', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->boolean("sent")->default(false);
             $table->json("json_data")->nullable(false);
+            $table->json('seen_by')->default("[]");
         });
     }
 
