@@ -26,17 +26,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::get('/iot/sync',[LinesStatesController::class,'get_min']);
-Route::get('/lines',[LinesStatesController::class,'get_all']);
-Route::post('/lines/state/set/{line_id}',[LinesStatesController::class,'change_line_state']);
-Route::get('/lines/state/{line_id}',[LinesStatesController::class,'get_line_state']);
-Route::post('/lines/maintenance/{option}',[LinesStatesController::class,'switch_on_or_off_maintance']);
-Route::post('/lines',[LinesStatesController::class,'create_line']);
-Route::get('/auth/password/forgotten',[SecurityLockingCodeController::class,'password_forgotten']);
-Route::post('/auth/password/get_new',[SecurityLockingCodeController::class,'get_new']);
-Route::get('/lines/logs/list',[ActionLogsController::class,'get_all']);
-Route::post('/lines/logs',[ActionLogsController::class,'save']);
-Route::get('/current_status',[LinesStatesController::class,'get_status']);
-Route::get('/cattle',[CattleLogsController::class, 'index']);
-Route::post('/cattle',[CattleLogsController::class, 'store']);
-Route::get('/cattle/log/confirm',[CattleLogsController::class, 'confirm']);
+Route::get('/iot/sync', [LinesStatesController::class,'get_min']);
+Route::get('/lines', [LinesStatesController::class,'get_all']);
+Route::post('/lines/state/set/{line_id}', [LinesStatesController::class,'change_line_state']);
+Route::get('/lines/state/{line_id}', [LinesStatesController::class,'get_line_state']);
+Route::post('/lines/maintenance/{option}', [LinesStatesController::class,'switch_on_or_off_maintance']);
+Route::post('/lines', [LinesStatesController::class,'create_line']);
+Route::get('/auth/password/forgotten', [SecurityLockingCodeController::class,'password_forgotten']);
+Route::post('/auth/password/get_new', [SecurityLockingCodeController::class,'get_new']);
+Route::get('/lines/logs/list', [ActionLogsController::class,'get_all']);
+Route::post('/lines/logs', [ActionLogsController::class,'save']);
+Route::get('/current_status', [LinesStatesController::class,'get_status']);
+Route::get('/cattle', [CattleLogsController::class, 'index'])->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
+Route::post('/cattle', [CattleLogsController::class, 'store'])->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
+Route::get('/cattle/log/confirm', [CattleLogsController::class, 'confirm'])->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
+
+Route::options('/cattle', function () {
+    return response()->json([], 200); // Respond with an empty JSON response
+})->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
