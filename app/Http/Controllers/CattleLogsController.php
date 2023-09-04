@@ -15,9 +15,9 @@ class CattleLogsController extends Controller
         $device_uuid = $request->cookie('X-device-uuid');
         if (!$device_uuid) {
             $device_uuid = (string) Str::uuid();
-            return response(CattleStateLogs::orderBy('created_at', 'desc')->get(['created_at', 'json_data']))->cookie('X-device-uuid', $device_uuid, 5256000, null, null, false, false, 'None');
+            return response(CattleStateLogs::orderBy('created_at', 'desc')->get(['created_at', 'json_data']))->cookie('X-device-uuid', $device_uuid, 5256000, null, null, true, false, 'None');
         }
-        $not_sent_logs = CattleStateLogs::whereJsonDoesntContain('seen_by', $device_uuid)->orderBy('created_at', 'desc')->limit(10)->get(['created_at', 'json_data']);
+        $not_sent_logs = CattleStateLogs::whereJsonDoesntContain('seen_by', $device_uuid)->orderBy('created_at', 'desc')->get(['created_at', 'json_data']);
         return response($not_sent_logs);
     }
 
@@ -28,7 +28,7 @@ class CattleLogsController extends Controller
             return response(['error' => 'Unrecognized device'], 403);
         }
         $not_sent_logs = CattleStateLogs::whereJsonDoesntContain('seen_by', $device_uuid)->orderBy('created_at', 'desc')
-                        ->limit(10)->get();
+                        ->get();
         $not_sent_logs->each(function ($log) use ($device_uuid) {
             $seenBy = json_decode($log->seen_by, true);
             $seenBy[] = $device_uuid; //push
