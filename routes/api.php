@@ -62,7 +62,7 @@ Route::get('/cars/alcohol', function (Request $request) {
             $car->save();
             return "Thank you for your confirmation!";
         } else {
-            return "The link mismatch we the current unlocking code!";
+            return "The link mismatch with the current unlocking code!";
         }
     } catch (DecryptException  $e) {
          return "The link is not genuine, we have sent the email with the correct code, kindly check your inbox";
