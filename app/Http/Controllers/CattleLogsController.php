@@ -43,7 +43,7 @@ class CattleLogsController extends Controller
     {
         $jsonData = json_decode($request->getContent(), true);
         // Validate the parsed JSON data
-        $validator = Validator::make($jsonData, [
+        $validator = Validator::make($jsonData ?? [], [
             'bpm' => 'required|integer',
             'temperature' => 'required|numeric',
             'acceleration_x' => 'required|numeric',
