@@ -6,8 +6,11 @@ use App\Http\Controllers\ActionLogsController;
 use App\Http\Controllers\SecurityLockingCodeController;
 use App\Http\Controllers\LinesStatesController;
 use App\Http\Controllers\CattleLogsController;
-use App\Models\SecurityLockingCode;
-use App\Models\LinesStates;
+use Illuminate\Support\Facades\Validator;
+use App\Models\carState;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +43,91 @@ Route::get('/current_status', [LinesStatesController::class,'get_status']);
 Route::get('/cattle', [CattleLogsController::class, 'index'])->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
 Route::post('/cattle', [CattleLogsController::class, 'store'])->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
 Route::get('/cattle/log/confirm', [CattleLogsController::class, 'confirm'])->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
-
 Route::options('/cattle', function () {
     return response()->json([], 200); // Respond with an empty JSON response
 })->middleware(\App\Http\Middleware\EnsureCorsAreEnabledWithCredentials::class);
+
+Route::get('/cars/alcohol', function (Request $request) {
+    $code = $request->code;
+    $car = carState::all()->first();
+    if (!$car) {
+        return "not a valid operation";
+    }
+    try {
+        $decrypted =  Crypt::decryptString(urldecode($code));
+
+        if ($decrypted == $car->last_unlock_pass) {
+            $car->last_unlock_pass = '1234'; //reset to default code to invalidate
+            $car->locked_state = false;
+            $car->save();
+            return "Thank you for your confirmation!";
+        } else {
+            return "The link mismatch we the current unlocking code!";
+        }
+    } catch (DecryptException  $e) {
+         return "The link is not genuine, we have sent the email with the correct code, kindly check your inbox";
+    }
+});
+
+Route::post('/cars/alcohol', function (Request $request) {
+    $jsonData = json_decode($request->getContent(), true);
+    // Validate the parsed JSON data
+    $validator = Validator::make($jsonData ?? [], [
+            'alcohol' => 'required|integer',
+            'emailto' => 'required|email',
+            'detected' => 'required|string',
+        ]);
+
+    if ($validator->fails()) {
+        // Validation failed
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+    $car = carState::all()->first();
+    $car = $car ?: new carState(["locked_state" => true]);
+    $car->save();
+
+    if ($jsonData['detected'] == 'y') {
+        if (!$car->locked_state) {
+        //send email and persit to DB
+            $car->locked_state =  true;
+            $randomString = Str::random(6); // Change the length as needed
+            $car->last_unlock_pass = $randomString;
+            $car->save();
+            $crypted = Crypt::encryptString($randomString);
+
+            $email = new \SendGrid\Mail\Mail();
+            $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
+            $email->setSubject("YOUR CAR IS PROTECTED");
+            $email->addTo($jsonData['emailto'], "Admin");
+            $email->addContent(
+                "text/html",
+                "<p style='line-height:1.6; font-family: Arial, Helvetica, sans-serif;'>
+                Hey!
+                <p>
+                    Our system detected that the current driver of your car is drunk.(level was approximately " . $jsonData['alcohol'] . ")
+                </p>
+                <p>
+                   For your car's safety, we have desactivated the engine.
+                   <br>
+                   Please <a href='https://safetylocker.fly.dev/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to unlock!
+                </p>
+                <hr>
+                <p style='text-align:center; padding:30px; color:darkblue;'>
+                    Car alcohol Detector | by Elvis@
+                </p>
+            </p>"
+            );
+            $sendgrid = new \SendGrid(env('SENDGRID_API_KEY_FULL'));
+            try {
+                $response = $sendgrid->send($email);
+                http_response_code($response->statusCode());
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+                http_response_code(400);
+            } finally {
+                return "locked";
+            }
+        }
+    }
+    return $car->locked_state ? "locked" : "unlocked";
+});
