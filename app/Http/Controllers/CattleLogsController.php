@@ -41,8 +41,9 @@ class CattleLogsController extends Controller
 
     public function store(Request $request)
     {
+        $jsonData = json_decode($request->getContent(), true);
         // Validate the parsed JSON data
-        $validator = Validator::make($request->json_data, [
+        $validator = Validator::make($jsonData, [
             'bpm' => 'required|integer',
             'temperature' => 'required|numeric',
             'acceleration_x' => 'required|numeric',
@@ -59,7 +60,7 @@ class CattleLogsController extends Controller
         $cattleStateLog = new CattleStateLogs();
 
         // Fill the model with the validated JSON data and set 'sent' to false
-        $cattleStateLog->json_data = json_encode($request->json_data);
+        $cattleStateLog->json_data = $request->getContent();
 
         // Save the record to the database
         $cattleStateLog->save();
