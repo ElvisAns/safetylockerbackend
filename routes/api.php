@@ -118,7 +118,7 @@ Route::post('/cars/alcohol', function (Request $request) {
                 </p>
             </p>"
             );
-            $sendgrid = new \SendGrid(env('SENDGRID_API_KEY_FULL'));
+            $sendgrid = new \SendGrid(config('custom.sendgrid_api'));
             try {
                 $response = $sendgrid->send($email);
                 http_response_code($response->statusCode());
@@ -253,7 +253,7 @@ Route::get('/gate/knock', function (Request $request) {
         </p>
     </p>"
     );
-    $sendgrid = new \SendGrid(env('SENDGRID_API_KEY'));
+    $sendgrid = new \SendGrid(config('custom.sendgrid_api'));
     try {
         $response = $sendgrid->send($email);
         http_response_code($response->statusCode());

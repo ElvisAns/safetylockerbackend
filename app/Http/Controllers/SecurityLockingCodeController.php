@@ -50,7 +50,7 @@ class SecurityLockingCodeController extends Controller
                 </p>
             </p>"
         );
-        $sendgrid = new \SendGrid(env('SENDGRID_API_KEY_FULL'));
+        $sendgrid = new \SendGrid(config('custom.sendgrid_api'));
         try {
             $response = $sendgrid->send($email);
             http_response_code($response->statusCode());
