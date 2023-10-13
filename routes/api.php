@@ -110,7 +110,7 @@ Route::post('/cars/alcohol', function (Request $request) {
                 <p>
                    For your car's safety, we have desactivated the engine.
                    <br>
-                   Please <a href='" . env('APP_URL') . "/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to unlock!
+                   Please <a href='" . env('APP_URL', 'https://demo.kvolts-lab.com') . "/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to unlock!
                 </p>
                 <hr>
                 <p style='text-align:center; padding:30px; color:darkblue;'>
@@ -245,7 +245,7 @@ Route::get('/gate/knock', function (Request $request) {
         <p>
             Do you recognize this request?
            <br>
-           Please <a href='" . env('APP_URL') . "/api/gate/grant?code=" . Str::uuid() . "'>click here</a> to grant access!
+           Please <a href='" . env('APP_URL', 'https://demo.kvolts-lab.com') . "/api/gate/grant?code=" . Str::uuid() . "'>click here</a> to grant access!
         </p>
         <hr>
         <p style='text-align:center; padding:30px; color:orange;'>
