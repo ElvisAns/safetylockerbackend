@@ -11,6 +11,7 @@ use App\Models\carState;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Models\SmartGateState;
 
 /*
 |--------------------------------------------------------------------------
@@ -109,7 +110,7 @@ Route::post('/cars/alcohol', function (Request $request) {
                 <p>
                    For your car's safety, we have desactivated the engine.
                    <br>
-                   Please <a href='https://safetylocker.fly.dev/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to unlock!
+                   Please <a href='" . env('APP_URL') . "/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to unlock!
                 </p>
                 <hr>
                 <p style='text-align:center; padding:30px; color:darkblue;'>
@@ -130,4 +131,81 @@ Route::post('/cars/alcohol', function (Request $request) {
         }
     }
     return $car->locked_state ? "locked" : "unlocked";
+});
+
+Route::get('/gate/changestate', function (Request $request) {
+    $state = SmartGateState::find(1);
+    $command = $request->get("command");
+    if (!$command) {
+        return "Failed to change the gate state";
+    }
+    if (str_contains($command, "open")) {
+        $state->closed = false;
+        $state->save();
+        return "Done, the gate is opening";
+    }
+    if (str_contains($command, "close")) {
+        $state->closed = true;
+        $state->save();
+        return "Done, the gate is closed!";
+    }
+
+    return "We are not able to recognize this command at the moment!";
+});
+
+Route::get('/gate/state', function (Request $request) {
+    $state = SmartGateState::find(1);
+    return $state->closed;
+});
+
+Route::get('/gate/grant', function (Request $request) {
+    $code = $request->get("code");
+    if (Str::isUuid($code)) {
+        echo "granted access";
+    } else {
+        echo "bad grant link";
+    }
+});
+
+Route::get('/gate/knock', function (Request $request) {
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+    ]);
+
+    if ($validator->fails()) {
+        return 'error';
+    }
+
+    $email = new \SendGrid\Mail\Mail();
+    $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
+    $email->setSubject("SOMEONE WANT TO GET INTO YOUR HOUSE");
+    $email->addTo($request->get('email'), "Admin");
+    $email->addContent(
+        "text/html",
+        "<p style='line-height:1.6; font-family: Arial, Helvetica, sans-serif;'>
+        Hey!
+        <p>
+           Hey, someone want to get access on your gate. 
+        </p>
+        <p>
+            Do you recognize this request?
+           <br>
+           Please <a href='" . env('APP_URL') . "/api/gate/grant?code=" . Str::uuid() . "'>click here</a> to grant access!
+        </p>
+        <hr>
+        <p style='text-align:center; padding:30px; color:orange;'>
+            Smart gate contoller | by Elvis@
+        </p>
+    </p>"
+    );
+    $sendgrid = new \SendGrid(env('SENDGRID_API_KEY'));
+    try {
+        $response = $sendgrid->send($email);
+        http_response_code($response->statusCode());
+    } catch (\Exception $e) {
+        echo $e->getMessage();
+        http_response_code(400);
+    } finally {
+        return "done";
+    }
 });
