@@ -14,10 +14,7 @@ return [
     | you may use many connections at once using the Database library.
     |
     */
-
-    'default' => env('APP_ENV') == "production" ? "production" : env('DB_CONNECTION', 'mysql'),
-
-
+    'default' => env("ON_FLY", 'n') == 'y' ? 'hostinger' : (env('APP_ENV') == "production" ? "production" : env('DB_CONNECTION', 'hostinger')),
     /*
     |--------------------------------------------------------------------------
     | Database Connections
@@ -44,7 +41,7 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'mysql' => [
+        'hostinger' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOSTINGER_HOST', '127.0.0.1'),
