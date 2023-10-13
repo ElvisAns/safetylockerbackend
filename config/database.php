@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('APP_ENV') == "production" ? 'aiven_sql' : env('DB_CONNECTION', 'mysql'),
+    'default' => env('APP_ENV') == "production" ? "production" : env('DB_CONNECTION', 'mysql'),
 
 
     /*
@@ -77,6 +77,16 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('AIVEN_ATTR_SSL_CA'),
             ]) : [],
+        ],
+
+        'production' => [
+            'driver' => 'mysql',
+            'host' => env('DB_PRODUCTION_HOST', '127.0.0.1'),
+            'port' => env('DB_PRODUCTION_PORT', '3306'),
+            'database' => env('DB_PRODUCTION_NAME', 'forge'),
+            'username' => env('DB_PRODUCTION_USER', 'forge'),
+            'password' => env('DB_PRODUCTION_PASSWORD', ''),
+            // ...
         ],
 
         'pgsql' => [
