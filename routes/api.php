@@ -142,12 +142,67 @@ Route::get('/gate/changestate', function (Request $request) {
     if (str_contains($command, "open")) {
         $state->closed = false;
         $state->save();
-        return "Done, the gate is opening";
+        $gateOpeningVariants = [
+            'Gate opening complete.',
+            'Gate unlocked.',
+            'Gate is now open.',
+            'Proceed through the gate.',
+            'Gate is unlocked and opening.',
+            'Gate opening sequence initiated.',
+            'Gate opening in progress.',
+            'Gate opening successful.',
+            'Gate is open, please proceed.',
+            'Gate is now open for traffic.',
+            'Gate is open, welcome!',
+          ];
+          // Get a random index in the array.
+        $randomIndex = array_rand($gateOpeningVariants);
+
+          // Get the random gate opening variant.
+        $randomGateOpeningVariant = $gateOpeningVariants[$randomIndex];
+        return $randomGateOpeningVariant;
     }
     if (str_contains($command, "close")) {
         $state->closed = true;
         $state->save();
-        return "Done, the gate is closed!";
+        $gateClosingVariants = [
+            'Gate closing complete.',
+            'Gate locked.',
+            'Gate is now closed.',
+            'Gate is locked and closing.',
+            'Gate closing sequence initiated.',
+            'Gate closing in progress.',
+            'Gate closing successful.',
+            'Gate is closed, please do not enter.',
+            'Gate is now closed for traffic.',
+            'Gate is closed, thank you!',
+          ];
+
+          // Get a random index in the array.
+        $randomIndex = array_rand($gateClosingVariants);
+
+          // Get the random gate closing variant.
+        $randomGateClosingVariant = $gateClosingVariants[$randomIndex];
+        return $randomGateClosingVariant;
+    }
+
+    if (str_contains($command, "thank")) {
+        $youAreWelcomeVariants = [
+            "You're welcome.",
+            "No problem.",
+            "It's my pleasure.",
+            "Anytime.",
+            "Don't mention it.",
+            "Happy to help.",
+            "You got it.",
+            "Not a big deal.",
+            "My pleasure.",
+            "It was nothing."
+        ];
+
+        // Pick a variant randomly
+        $randomResponse = $youAreWelcomeVariants[array_rand($youAreWelcomeVariants)];
+        return  $randomResponse;
     }
 
     return "We are not able to recognize this command at the moment!";
