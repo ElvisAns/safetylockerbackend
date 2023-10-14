@@ -50,7 +50,7 @@ return [
             'password' => env('DB_PASSWORD', '')
         ],
 
-        'stagging' => [
+        'staging' => [
             'driver' => 'mysql',
             'url' => env('AIVEN_DB_URI'),
             'charset' => 'utf8mb4',

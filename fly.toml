@@ -11,7 +11,7 @@ processes = []
     PHP_VERSION = "7.4"
 
 [env]
-  APP_ENV = "production"
+  APP_ENV = "staging"
   LOG_CHANNEL = "stderr"
   LOG_LEVEL = "info"
   LOG_STDERR_FORMATTER = "Monolog\\Formatter\\JsonFormatter"

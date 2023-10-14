@@ -15,3 +15,5 @@ yarn-error.log
 /.vscode
 fly.toml
 *.pem
+.htaccess
+.env.*
