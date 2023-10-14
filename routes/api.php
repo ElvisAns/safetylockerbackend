@@ -96,6 +96,9 @@ Route::post('/cars/alcohol', function (Request $request) {
             $car->save();
             $crypted = Crypt::encryptString($randomString);
 
+            $lat = $jsonData['lat'] ?? '-1.9569586';
+            $long = $jsonDate['long'] ?? '30.0538006';
+
             $email = new \SendGrid\Mail\Mail();
             $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
             $email->setSubject("YOUR CAR IS PROTECTED");
@@ -108,7 +111,7 @@ Route::post('/cars/alcohol', function (Request $request) {
                     Our system detected that the current driver of your car is drunk.(level was approximately " . $jsonData['alcohol'] . ")
                 </p>
                 <p>
-                   For your car's safety, we have desactivated the engine.
+                   For your car's safety, we have desactivated the engine. Click <a href='https://www.google.com/maps?q=" . $lat . ',' . $long . "'>here to see current vehicle location</a>!
                    <br>
                    Please <a href='" . env('APP_URL', 'https://demo.kvolts-lab.com') . "/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to unlock!
                 </p>
