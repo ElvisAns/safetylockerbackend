@@ -14,7 +14,7 @@ return [
     | you may use many connections at once using the Database library.
     |
     */
-    'default' => env("ON_FLY", 'n') == 'y' ? 'hostinger' : (env('APP_ENV') == "production" ? "production" : env('DB_CONNECTION', 'hostinger')),
+    'default' => env('APP_ENV', 'local'),
     /*
     |--------------------------------------------------------------------------
     | Database Connections
@@ -41,27 +41,16 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'hostinger' => [
+        'local' => [
             'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOSTINGER_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_HOSTINGER', 'forge'),
-            'username' => env('DB_HOSTINGER_USERNAME', 'forge'),
-            'password' => env('DB_HOSTINGER_PWD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'database' => env('DB_NAME', 'forge'),
+            'username' => env('DB_USER', 'forge'),
+            'password' => env('DB_PASSWORD', '')
         ],
 
-        'aiven_sql' => [
+        'stagging' => [
             'driver' => 'mysql',
             'url' => env('AIVEN_DB_URI'),
             'charset' => 'utf8mb4',
@@ -72,18 +61,17 @@ return [
             'engine' => null,
             'sslmode' => 'require',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('AIVEN_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => __DIR__ . "/ca.pem",
             ]) : [],
         ],
 
         'production' => [
             'driver' => 'mysql',
-            'host' => env('DB_PRODUCTION_HOST', '127.0.0.1'),
-            'port' => env('DB_PRODUCTION_PORT', '3306'),
-            'database' => env('DB_PRODUCTION_NAME', 'forge'),
-            'username' => env('DB_PRODUCTION_USER', 'forge'),
-            'password' => env('DB_PRODUCTION_PASSWORD', ''),
-            // ...
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_NAME', 'forge'),
+            'username' => env('DB_USER', 'forge'),
+            'password' => env('DB_PASSWORD', '')
         ],
 
         'pgsql' => [
