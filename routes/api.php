@@ -108,7 +108,7 @@ Route::post('/cars/alcohol', function (Request $request) {
                 "<p style='line-height:1.6; font-family: Arial, Helvetica, sans-serif;'>
                 Hey!
                 <p>
-                    Our system detected that the current driver of your car is drunk.(level was approximately " . $jsonData['alcohol'] . ")
+                    Our system detected that the current driver of your car (with RAD203A plate number) is drunk.(level was approximately " . $jsonData['alcohol'] . ")
                 </p>
                 <p>
                    For your car's safety, we have desactivated the engine. Click <a href='https://www.google.com/maps?q=" . $lat . ',' . $long . "'>here to see current vehicle location</a>!
