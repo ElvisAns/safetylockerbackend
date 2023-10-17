@@ -17,7 +17,7 @@ class CreateTelegramBotUsersTable extends Migration
             $table->id();
             $table->timestamps();
             $table->string("username")->require();
-            $table->string("chat_id")->index()->require();
+            $table->bigInteger('chat_id')->unique();
         });
     }
 
