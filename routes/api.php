@@ -319,16 +319,50 @@ Route::prefix('telegram')->group(function () {
         if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
             $chatId = $data['message']['chat']['id'];
             $username = $data['message']['from']['username'];
-            Longman\TelegramBot\Request::sendMessage([
-                'chat_id' => $chatId,
-                'text' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
-            ]);
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 $user = new TelegramBotUsers();
-                $user->user_name = $username;
+                $user->username = $username;
                 $user->chat_id = $chatId;
-                $user->save();
+                $success = $user->save();
+                if ($success) {
+                    Longman\TelegramBot\Request::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
+                    ]);
+                } else {
+                    Longman\TelegramBot\Request::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "Bonjour @$username, merci de ressayer!"
+                     ]);
+                }
+            } else {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous etes deja abonné, si vous souhaiter arreter, veuillez envoyer /stop"
+                ]);
             }
+        } elseif (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/stop') {
+            $chatId = $data['message']['chat']['id'];
+            $username = $data['message']['from']['username'];
+            if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous n'etes pas abonné pour l'instant!"
+                ]);
+            } else {
+                TelegramBotUsers::where('chat_id', '=', $chatId)->delete();
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous venez d'etre desabonné avec succès!"
+                ]);
+            }
+        } else {
+            $chatId = $data['message']['chat']['id'];
+            $username = $data['message']['from']['username'];
+            Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $chatId,
+                'text' => "Bonjour @$username, \npour l'instant nous n'avons que deux commandes : /start & /stop\nMerci!"
+            ]);
         }
         return response()->json(['status' => 'ok']);
     });
