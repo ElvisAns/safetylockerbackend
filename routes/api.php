@@ -318,7 +318,7 @@ Route::prefix('telegram')->group(function () {
         $data = json_decode($request->getContent(), true);
         if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
             $chatId = (string) $data['message']['chat']['id'];
-            $username = $data['message']['from']['username'];
+            $username = (string) $data['message']['chat']['username'] ?? "lambda";
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 $user = new TelegramBotUsers();
                 $user->username = $username;
@@ -343,7 +343,7 @@ Route::prefix('telegram')->group(function () {
             }
         } elseif (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/stop') {
             $chatId = (string) $data['message']['chat']['id'];
-            $username = $data['message']['from']['username'];
+            $username = (string) $data['message']['chat']['username'] ?? "lambda";
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 Longman\TelegramBot\Request::sendMessage([
                     'chat_id' => $chatId,
@@ -358,7 +358,7 @@ Route::prefix('telegram')->group(function () {
             }
         } else {
             $chatId = (string) $data['message']['chat']['id'];
-            $username = $data['message']['from']['username'];
+            $username = (string) $data['message']['chat']['username'] ?? "lambda";
             Longman\TelegramBot\Request::sendMessage([
                 'chat_id' => $chatId,
                 'text' => "Bonjour @$username, \npour l'instant nous n'avons que deux commandes : /start & /stop\nMerci!"
