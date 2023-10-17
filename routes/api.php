@@ -321,12 +321,14 @@ Route::prefix('telegram')->group(function () {
             $username = $data['message']['from']['username'];
             Longman\TelegramBot\Request::sendMessage([
                 'chat_id' => $chatId,
-                'message' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
+                'text' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
             ]);
-            $user = new TelegramBotUsers();
-            $user->user_name = $username;
-            $user->chat_id = $chatId;
-            $user->save();
+            if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
+                $user = new TelegramBotUsers();
+                $user->user_name = $username;
+                $user->chat_id = $chatId;
+                $user->save();
+            }
         }
         return response()->json(['status' => 'ok']);
     });
