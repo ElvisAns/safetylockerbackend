@@ -293,10 +293,10 @@ Route::prefix('telegram')->group(function () {
         $users = TelegramBotUsers::all();
         foreach ($users as $user) {
             $messages = [
-                "Salut 👋,\nJ'ai reçu une alerte de votre patient ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
-                "Hello 👋,\nUne alerte de votre patient a été signalée ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
-                "Bonjour 👋,\nUn patient a émis une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
-                "Salutations 👋,\nVotre patient a généré une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
+                "Salut 👋,\nJ'ai reçu une alerte de votre patient ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Hello 👋,\nUne alerte de votre patient a été signalée ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Bonjour 👋,\nUn patient a émis une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Salutations 👋,\nVotre patient a généré une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
             ];
             $randomMessage = $messages[array_rand($messages)];
             Longman\TelegramBot\Request::sendMessage([
