@@ -275,7 +275,7 @@ Route::prefix('telegram')->group(function () {
     $token = env("TELEGRAM_BOT_API_TOKEN");
     new \Longman\TelegramBot\Telegram($token);
 
-    Route::get('/notify', function (Request $request) {
+    Route::post('/notify', function (Request $request) {
         //message from device
 
         $jsonData = json_decode($request->getContent(), true);
@@ -301,7 +301,13 @@ Route::prefix('telegram')->group(function () {
             $randomMessage = $messages[array_rand($messages)];
             Longman\TelegramBot\Request::sendMessage([
                 'chat_id' => $user->chat_id,
-                'message' => $randomMessage
+                'text' => $randomMessage
+            ]);
+        }
+        if ($users->count() === 0) {
+            \Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => "5017231951",
+                "text" => "Salut 👋,\nJ'ai reçu une alerte de votre patient ! \nBPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nFaites quelque chose svp!!!",
             ]);
         }
     });
