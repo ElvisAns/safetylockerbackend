@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use App\Models\SmartGateState;
+use App\Models\TelegramBotUsers;
 
 /*
 |--------------------------------------------------------------------------
@@ -266,4 +267,60 @@ Route::get('/gate/knock', function (Request $request) {
     } finally {
         return "done";
     }
+});
+
+
+Route::prefix('telegram')->group(function () {
+
+    $token = env("TELEGRAM_BOT_API_TOKEN");
+    new \Longman\TelegramBot\Telegram($token);
+
+    Route::get('/notify', function (Request $request) {
+        //message from device
+
+        $jsonData = json_decode($request->getContent(), true);
+        // Validate the parsed JSON data
+        $validator = Validator::make($jsonData ?? [], [
+            'bpm' => 'required|integer',
+            'temperature' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            // Validation failed
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $users = TelegramBotUsers::all();
+        foreach ($users as $user) {
+            $messages = [
+                "Salut 👋,\nJ'ai reçu une alerte de votre patient ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
+                "Hello 👋,\nUne alerte de votre patient a été signalée ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
+                "Bonjour 👋,\nUn patient a émis une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
+                "Salutations 👋,\nVotre patient a généré une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "\nMerci !",
+            ];
+            $randomMessage = $messages[array_rand($messages)];
+            Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $user->chat_id,
+                'message' => $randomMessage
+            ]);
+        }
+    });
+
+    Route::post("/webhook", function (Request $request) {
+        //webhook request
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
+            $chatId = $data['message']['chat']['id'];
+            $username = $data['message']['from']['username'];
+            Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $chatId,
+                'message' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
+            ]);
+            $user = new TelegramBotUsers();
+            $user->user_name = $username;
+            $user->chat_id = $chatId;
+            $user->save();
+        }
+        return response()->json(['status' => 'ok']);
+    });
 });

@@ -11,8 +11,8 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "sendgrid/sendgrid": "^8.0",
-        "telegram-bot/api": "^2.5"
+        "longman/telegram-bot": "^0.81.0",
+        "sendgrid/sendgrid": "^8.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -40,7 +40,11 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@telegram-set-webhook"
+        ],
+        "telegram-set-webhook": [
+            "php artisan telegram:webhook:set"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
