@@ -310,6 +310,7 @@ Route::prefix('telegram')->group(function () {
                 "text" => "Salut 👋,\nJ'ai reçu une alerte de votre patient ! \nBPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nFaites quelque chose svp!!!",
             ]);
         }
+        return response("ok");
     });
 
     Route::post("/webhook", function (Request $request) {
