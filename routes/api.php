@@ -316,11 +316,9 @@ Route::prefix('telegram')->group(function () {
     Route::post("/webhook", function (Request $request) {
         //webhook request
         $data = json_decode($request->getContent(), true);
-        file_put_contents('request.txt', $request->getContent());
         if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
             $chatId = (string) $data['message']['chat']['id'];
             $username = $data['message']['from']['username'];
-            file_put_contents('chid.txt', $chatId);
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 $user = new TelegramBotUsers();
                 $user->username = $username;
@@ -329,7 +327,7 @@ Route::prefix('telegram')->group(function () {
                 if ($success) {
                     Longman\TelegramBot\Request::sendMessage([
                         'chat_id' => $chatId,
-                        'text' => "Bonjour @$username, $chatId merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
+                        'text' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
                     ]);
                 } else {
                     Longman\TelegramBot\Request::sendMessage([
@@ -344,7 +342,7 @@ Route::prefix('telegram')->group(function () {
                 ]);
             }
         } elseif (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/stop') {
-            $chatId = $data['message']['chat']['id'];
+            $chatId = (string) $data['message']['chat']['id'];
             $username = $data['message']['from']['username'];
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 Longman\TelegramBot\Request::sendMessage([
@@ -359,7 +357,7 @@ Route::prefix('telegram')->group(function () {
                 ]);
             }
         } else {
-            $chatId = $data['message']['chat']['id'];
+            $chatId = (string) $data['message']['chat']['id'];
             $username = $data['message']['from']['username'];
             Longman\TelegramBot\Request::sendMessage([
                 'chat_id' => $chatId,
