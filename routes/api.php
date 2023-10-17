@@ -316,9 +316,11 @@ Route::prefix('telegram')->group(function () {
     Route::post("/webhook", function (Request $request) {
         //webhook request
         $data = json_decode($request->getContent(), true);
+        file_put_contents('request.txt', $request->getContent());
         if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
             $chatId = $data['message']['chat']['id'];
             $username = $data['message']['from']['username'];
+            file_put_contents('chid.txt', $chatId);
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 $user = new TelegramBotUsers();
                 $user->username = $username;
