@@ -90,7 +90,7 @@ Route::post('/cars/alcohol', function (Request $request) {
 
     if ($jsonData['detected'] == 'y') {
         if (!$car->locked_state) {
-        //send email and persit to DB
+            //send email and persit to DB
             $car->locked_state =  true;
             $randomString = Str::random(6); // Change the length as needed
             $car->last_unlock_pass = $randomString;
@@ -133,7 +133,51 @@ Route::post('/cars/alcohol', function (Request $request) {
                 return "locked";
             }
         }
+    } elseif ($car->locked_state) { //not dectected but car already locked
+        //detected, send first send email to owner for asking activation
+        //send email and persit to DB
+        $randomString = Str::random(6); // Change the length as needed
+        $car->last_unlock_pass = $randomString;
+        $car->save();
+        $crypted = Crypt::encryptString($randomString);
+
+        $lat = $jsonData['lat'] ?? '-1.9569586';
+        $long = $jsonDate['long'] ?? '30.0538006';
+
+        $email = new \SendGrid\Mail\Mail();
+        $email->setFrom("ansimapersic@gmail.com", "Elvis Dev@");
+        $email->setSubject("YOUR CAR IS PROTECTED");
+        $email->addTo($jsonData['emailto'], "Admin");
+        $email->addContent(
+            "text/html",
+            "<p style='line-height:1.6; font-family: Arial, Helvetica, sans-serif;'>
+            Hey!
+            <p>
+                Our system detected that the current driver of your car (with RAD203A plate number) is no longer drunk.(level was approximately " . $jsonData['alcohol'] . ")
+            </p>
+            <p>
+                Click <a href='https://www.google.com/maps?q=" . $lat . ',' . $long . "'>here to see current vehicle location</a>!
+               <br>
+               Please <a href='" . env('APP_URL', 'https://demo.kvolts-lab.com') . "/api/cars/alcohol/?code=" . urlencode($crypted) . "'>click here</a> to re enable the engine!
+            </p>
+            <hr>
+            <p style='text-align:center; padding:30px; color:darkblue;'>
+                Car alcohol Detector | by Elvis@
+            </p>
+        </p>"
+        );
+        $sendgrid = new \SendGrid(config('custom.sendgrid_api'));
+        try {
+            $response = $sendgrid->send($email);
+            http_response_code($response->statusCode());
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            http_response_code(400);
+        } finally {
+            return "locked";
+        }
     }
+
     return $car->locked_state ? "locked" : "unlocked";
 });
 
@@ -314,7 +358,7 @@ Route::prefix('telegram')->group(function () {
     });
 
     Route::post("/webhook", function (Request $request) {
-        
+
         //webhook request
         $data = json_decode($request->getContent(), true);
         $chat = $data['message']['chat'];
