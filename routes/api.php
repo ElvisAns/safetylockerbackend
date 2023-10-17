@@ -329,7 +329,7 @@ Route::prefix('telegram')->group(function () {
                 if ($success) {
                     Longman\TelegramBot\Request::sendMessage([
                         'chat_id' => $chatId,
-                        'text' => "Bonjour @$username, merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
+                        'text' => "Bonjour @$username, $chatId merci de vous inscrire,vous serez au courant chaque fois que votre patient est en besoin!"
                     ]);
                 } else {
                     Longman\TelegramBot\Request::sendMessage([
