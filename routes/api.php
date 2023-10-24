@@ -259,7 +259,7 @@ Route::get('/gate/changestate', function (Request $request) {
 Route::get('/gate/state', function (Request $request) {
     $state = SmartGateState::find(1);
     $res = $state->closed;
-    if ($state->closed) {
+    if (!$state->closed) {
         $state->closed = true;
         $state->save();
     }
