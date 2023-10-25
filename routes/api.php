@@ -418,3 +418,54 @@ Route::prefix('telegram')->group(function () {
         return response()->json(['status' => 'ok']);
     });
 });
+
+Route::post("/sms/notify", function (Request $request) {
+    $jsonData = json_decode($request->getContent(), true);
+    $validator = Validator::make($jsonData ?? [], [
+        'phone' => 'required|string|size:13',
+        'cry' => 'required',
+        'moisture' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $crying = $jsonData["cry"] == 1 ? "Baby is crying" : "Baby is quiet";
+    $urine = $jsonData["moisture"] == 1 ? ", also has peed" : " and has not yet peed";
+
+    $base_url = "https://l3q31r.api.infobip.com";
+    $authorization = env("INFOBIP_KEY");
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $base_url . '/sms/2/text/advanced',
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => '',
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_POSTFIELDS => '{
+        "messages": [
+            {
+                "from": "serviceSMS",
+                "destinations": [
+                    {
+                        "to": "' . $jsonData['phone'] . '"
+                    }
+                ],
+                "text": "Hello! Your baby care has an update!\nTemperature is at ' . $jsonData['temperature'] . ', ' . $crying . $urine . '!"
+            }
+        ]
+    }',
+      CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/json',
+        'Authorization: App ' . $authorization
+      ),
+    ));
+
+    $response = curl_exec($curl);
+    curl_close($curl);
+    echo "ok";
+});
