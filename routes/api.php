@@ -429,14 +429,14 @@ Route::post("/sms/notify", function (Request $request) {
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    $message = "Hello! Your baby care has an update!\nTemperature is at ' . $jsonData['temperature'] . ', ' . $crying . $urine . '!";
+    $crying = $jsonData["cry"] == 1 ? "Baby is crying" : "Baby is quiet";
+    $urine = $jsonData["moisture"] == 1 ? ", also has peed" : " and has not yet peed";
+
+    $message = "Hello! Your baby care has an update!\nTemperature is at " . $jsonData['temperature'] . ', ' . $crying . $urine . '!';
 
     if (isset($jsonData['message'])) {
         $message = $jsonData['message'];
     }
-
-    $crying = $jsonData["cry"] == 1 ? "Baby is crying" : "Baby is quiet";
-    $urine = $jsonData["moisture"] == 1 ? ", also has peed" : " and has not yet peed";
 
     $base_url = "https://l3q31r.api.infobip.com";
     $authorization = env("INFOBIP_KEY");
