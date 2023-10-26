@@ -438,6 +438,22 @@ Route::post("/sms/notify", function (Request $request) {
         $message = $jsonData['message'];
     }
 
+    $data = [
+        "messages" => [
+            [
+                "from" => "serviceSMS",
+                "destinations" => [
+                    [
+                        "to" => $jsonData['phone']
+                    ]
+                ],
+                "text" => $message
+            ]
+        ]
+    ];
+
+    $payload  = json_encode($data);
+
     $base_url = "https://l3q31r.api.infobip.com";
     $authorization = env("INFOBIP_KEY");
     $curl = curl_init();
@@ -450,19 +466,7 @@ Route::post("/sms/notify", function (Request $request) {
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'POST',
-      CURLOPT_POSTFIELDS => '{
-        "messages": [
-            {
-                "from": "serviceSMS",
-                "destinations": [
-                    {
-                        "to": "' . $jsonData['phone'] . '"
-                    }
-                ],
-                "text": "' . $message . '"
-            }
-        ]
-    }',
+      CURLOPT_POSTFIELDS => $payload,
       CURLOPT_HTTPHEADER => array(
         'Content-Type: application/json',
         'Authorization: App ' . $authorization
