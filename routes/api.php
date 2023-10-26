@@ -422,13 +422,17 @@ Route::prefix('telegram')->group(function () {
 Route::post("/sms/notify", function (Request $request) {
     $jsonData = json_decode($request->getContent(), true);
     $validator = Validator::make($jsonData ?? [], [
-        'phone' => 'required|string|size:13',
-        'cry' => 'required',
-        'moisture' => 'required'
+        'phone' => 'required|string|size:13'
     ]);
 
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $message = "Hello! Your baby care has an update!\nTemperature is at ' . $jsonData['temperature'] . ', ' . $crying . $urine . '!";
+
+    if (isset($jsonData['message'])) {
+        $message = $jsonData['message'];
     }
 
     $crying = $jsonData["cry"] == 1 ? "Baby is crying" : "Baby is quiet";
@@ -455,7 +459,7 @@ Route::post("/sms/notify", function (Request $request) {
                         "to": "' . $jsonData['phone'] . '"
                     }
                 ],
-                "text": "Hello! Your baby care has an update!\nTemperature is at ' . $jsonData['temperature'] . ', ' . $crying . $urine . '!"
+                "text": "' . $message . '"
             }
         ]
     }',
