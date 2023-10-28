@@ -428,9 +428,12 @@ Route::post("/sms/notify", function (Request $request) {
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
     }
-
-    $crying = $jsonData["cry"] == 1 ? "Baby is crying" : "Baby is quiet";
-    $urine = $jsonData["moisture"] == 1 ? ", also has peed" : " and has not yet peed";
+    if (isset($jsonData["cry"])) {
+        $crying = $jsonData["cry"] == 1 ? "Baby is crying" : "Baby is quiet";
+    }
+    if (isset($jsonData['moisture'])) {
+        $urine = $jsonData["moisture"] == 1 ? ", also has peed" : " and has not yet peed";
+    }
 
     $message = "Hello! Your baby care has an update!\nTemperature is at " . $jsonData['temperature'] . ', ' . $crying . $urine . '!';
 
