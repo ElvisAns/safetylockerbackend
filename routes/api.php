@@ -435,7 +435,9 @@ Route::post("/sms/notify", function (Request $request) {
         $urine = $jsonData["moisture"] == 1 ? ", also has peed" : " and has not yet peed";
     }
 
-    $message = "Hello! Your baby care has an update!\nTemperature is at " . $jsonData['temperature'] . ', ' . $crying . $urine . '!';
+    if (isset($jsonData['temperature'])) {
+        $message = "Hello! Your baby care has an update!\nTemperature is at " . $jsonData['temperature'] . ', ' . $crying . $urine . '!';
+    }
 
     if (isset($jsonData['message'])) {
         $message = $jsonData['message'];
