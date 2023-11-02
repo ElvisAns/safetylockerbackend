@@ -342,10 +342,10 @@ Route::prefix('telegram')->group(function () {
         $users = TelegramBotUsers::all();
         foreach ($users as $user) {
             $messages = [
-                "Salut 👋,\nJ'ai reçu une alerte de votre patient ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
-                "Hello 👋,\nUne alerte de votre patient a été signalée ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
-                "Bonjour 👋,\nUn patient a émis une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
-                "Salutations 👋,\nVotre patient a généré une alerte ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Salut 👋,\nJ'ai reçu une alerte de votre patient salle No3, Clinic VIP ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Hello 👋,\nUne alerte de votre patient a été signalée depuis la salle No3, Clinic VIP ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Bonjour 👋,\nUn patient a émis une alerte depuis la salle No3, Clinic VIP ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
+                "Salutations 👋,\nVotre patient a généré une alerte depuis la salle No3, Clinic VIP ! BPM : " . $jsonData['bpm'] . ", Température : " . $jsonData['temperature'] . "°C\nMerci !",
             ];
             $randomMessage = $messages[array_rand($messages)];
             Longman\TelegramBot\Request::sendMessage([
@@ -370,6 +370,22 @@ Route::prefix('telegram')->group(function () {
         if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
             $chatId = (string) $data['message']['chat']['id'];
             $username = $chat['username'] ?? "lambda";
+            Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $chatId,
+                'text' => "Bonjour @$username, veuillez saisir le mot de passe pour pouvoir vous abonner.\nMerci!\nNB: Le mot de passe doit etre sous format MP XXXXX"
+             ]);
+        } elseif (isset($data['message']) && isset($data['message']['text']) && substr($data['message']['text'], 0, 2) === 'MP') {
+            $mp = trim(substr($data['message']['text'], 3));
+            $chatId = (string) $data['message']['chat']['id'];
+            $username = $chat['username'] ?? "lambda";
+            if ($mp != "210GOMA") {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous avez entré un mot de passe incorrect, veuillez ressayer!"
+                 ]);
+                 return response()->json(['status' => 'ok']);
+                 exit();
+            }
             if (!TelegramBotUsers::where("chat_id", "=", $chatId)->exists()) {
                 $user = new TelegramBotUsers();
                 $user->username = $username;
