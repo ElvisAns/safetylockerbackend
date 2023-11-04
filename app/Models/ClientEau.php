@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class ClientEau extends Model
 {
     use HasFactory;
+    
+    private $fillable = ['id'];
 }
