@@ -479,7 +479,7 @@ Route::prefix('eau')->group(function () {
             foreach ($users as $user) {
                 Longman\TelegramBot\Request::sendMessage([
                 'chat_id' => $user->chat_id,
-                'text' => "Salut! \nNouvelle consommation enregistré de $clientEau->quantity millilitres"
+                'text' => "Salut! \nNouvelle consommation enregistré de $request->consomation ml, il vous reste  $clientEau->quantity ml"
                 ]);
             }
         }
