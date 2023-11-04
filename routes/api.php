@@ -472,8 +472,16 @@ Route::prefix('eau')->group(function () {
                 ]);
             }
         } else {
+            $users = TelegramBotEauUsers::all();
             $clientEau->quantity = $tmp;
             $clientEau->save();
+            $users = TelegramBotEauUsers::all();
+            foreach ($users as $user) {
+                Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $user->chat_id,
+                'text' => "Salut! \nNouvelle consommation enregistré de $clientEau->quantity millilitres"
+                ]);
+            }
         }
         return response($clientEau->quantity);
     });
@@ -510,7 +518,7 @@ Route::prefix('eau')->group(function () {
             } else {
                 $clientEau = ClientEau::firstOrCreate(['id' => 1]);
                 $d = $data['message']['text'];
-                preg_match('/([0-9]+)/', $d , $matches);
+                preg_match('/([0-9]+)/', $d, $matches);
                 $amount = isset($matches[1]) ? (int) $matches[1] : null;
                 if ($amount) {
                     $clientEau->quantity = $clientEau->quantity + ($amount * 1000);
