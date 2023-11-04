@@ -13,6 +13,8 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Encryption\DecryptException;
 use App\Models\SmartGateState;
 use App\Models\TelegramBotUsers;
+use App\Models\TelegramBotEauUsers;
+use App\Models\ClientEau;
 
 /*
 |--------------------------------------------------------------------------
@@ -378,7 +380,7 @@ Route::prefix('telegram')->group(function () {
             $mp = trim(substr($data['message']['text'], 3));
             $chatId = (string) $data['message']['chat']['id'];
             $username = $chat['username'] ?? "lambda";
-            if ($mp != "210GOMA") {
+            if ($mp != "222GOMA") {
                 Longman\TelegramBot\Request::sendMessage([
                     'chat_id' => $chatId,
                     'text' => "Bonjour @$username, vous avez entré un mot de passe incorrect, veuillez ressayer!"
@@ -429,6 +431,147 @@ Route::prefix('telegram')->group(function () {
             Longman\TelegramBot\Request::sendMessage([
                 'chat_id' => $chatId,
                 'text' => "Bonjour @$username, \npour l'instant nous n'avons que deux commandes : /start & /stop\nMerci!"
+            ]);
+        }
+        return response()->json(['status' => 'ok']);
+    });
+});
+
+Route::prefix('eau')->group(function () {
+
+    $token = env("TELEGRAM_BOT_EAU_API_TOKEN");
+    new \Longman\TelegramBot\Telegram($token);
+
+    Route::post('/notify', function (Request $request) {
+        // Validate the parsed JSON data
+        $validator = Validator::make($request->all(), [
+            'consomation' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            // Validation failed
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $clientEau = ClientEau::firstOrCreate(['id' => 1]);
+        $tmp = $clientEau->quantity - $request->consomation;
+        if ($clientEau->quantity == 0 || $tmp <= 0) {
+            $clientEau->quantity = 0;
+            $clientEau->save();
+            $users = TelegramBotEauUsers::all();
+            $message = "Salut! \nVous etes à terme de votre souscription eau!\nMerci de recharger votre compteur prepayé";
+            foreach ($users as $user) {
+                Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $user->chat_id,
+                'text' => $message
+                ]);
+            }
+            if ($users->count() === 0) {
+                \Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => "5017231951",
+                "text" => $message
+                ]);
+            }
+        } else {
+            $clientEau->quantity = $tmp;
+            $clientEau->save();
+        }
+        return response($clientEau->quantity);
+    });
+
+    Route::post("/webhook", function (Request $request) {
+
+        //webhook request
+        $data = json_decode($request->getContent(), true);
+        $chat = $data['message']['chat'];
+        if (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/moncompte') {
+            $chatId = (string) $data['message']['chat']['id'];
+            $username = $chat['username'] ?? "lambda";
+            if (!TelegramBotEauUsers::where("chat_id", "=", $chatId)->exists()) {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous n'etes pas abonné pour l'instant!"
+                ]);
+            } else {
+                $clientEau = ClientEau::firstOrCreate(['id' => 1]);
+                $litre = round(($clientEau->quantity / 1000), 2);
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Salut @$username !, \nIl vous reste $litre litres pour votre souscription actuelle"
+                ]);
+            }
+        } elseif (isset($data['message']) && isset($data['message']['text']) && substr($data['message']['text'], 0, 8) === '/acheter') {
+            $chatId = (string) $data['message']['chat']['id'];
+            $username = $chat['username'] ?? "lambda";
+            if (!TelegramBotEauUsers::where("chat_id", "=", $chatId)->exists()) {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous n'etes pas abonné pour l'instant!"
+                ]);
+            } else {
+                $clientEau = ClientEau::firstOrCreate(['id' => 1]);
+                preg_match('/\b([0-9]+)\b/', $data['message']['text'], $matches);
+                $amount = isset($matches[1]) ? (int) $matches[1] : null;
+                if ($amount) {
+                    $clientEau->quantity = $clientEau->quantity + ($amount * 1000);
+                    $clientEau->save();
+                    $litre = round(($clientEau->quantity / 1000), 2);
+                    Longman\TelegramBot\Request::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "Salut @$username !, \nVous venez d'acheter $amount litres, vous disposez presentement de $litre litres dans votre compteur"
+                    ]);
+                } else {
+                    Longman\TelegramBot\Request::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "Salut @$username !, \nVeuillez respecter le format /acheter XXXXlitres"
+                    ]);
+                }
+            }
+        } elseif (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/start') {
+            $chatId = (string) $data['message']['chat']['id'];
+            $username = $chat['username'] ?? "lambda";
+            if (!TelegramBotEauUsers::where("chat_id", "=", $chatId)->exists()) {
+                $user = new TelegramBotEauUsers();
+                $user->username = $username;
+                $user->chat_id = $chatId;
+                $success = $user->save();
+                if ($success) {
+                    Longman\TelegramBot\Request::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "Bonjour @$username, merci de vous inscrire!"
+                    ]);
+                } else {
+                    Longman\TelegramBot\Request::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "Bonjour @$username, merci de ressayer!"
+                     ]);
+                }
+            } else {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous etes deja abonné, si vous souhaiter arreter, veuillez envoyer /stop"
+                ]);
+            }
+        } elseif (isset($data['message']) && isset($data['message']['text']) && $data['message']['text'] == '/stop') {
+            $chatId = (string) $data['message']['chat']['id'];
+            $username = $chat['username'] ?? "lambda";
+            if (!TelegramBotEauUsers::where("chat_id", "=", $chatId)->exists()) {
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous n'etes pas abonné pour l'instant!"
+                ]);
+            } else {
+                TelegramBotEauUsers::where('chat_id', '=', $chatId)->delete();
+                Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Bonjour @$username, vous venez d'etre desabonné avec succès!"
+                ]);
+            }
+        } else {
+            $chatId = (string) $data['message']['chat']['id'];
+            $username = $chat['username'] ?? "lambda";
+            Longman\TelegramBot\Request::sendMessage([
+                'chat_id' => $chatId,
+                'text' => "Bonjour @$username, \npour l'instant nous n'avons que quatre commandes : /start, /acheter, /moncompte, /stop\nMerci!"
             ]);
         }
         return response()->json(['status' => 'ok']);
