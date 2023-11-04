@@ -9,5 +9,5 @@ class ClientEau extends Model
 {
     use HasFactory;
     
-    private $fillable = ['id'];
+    protected $fillable = ['id'];
 }
