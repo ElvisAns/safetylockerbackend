@@ -472,15 +472,17 @@ Route::prefix('eau')->group(function () {
                 ]);
             }
         } else {
-            $users = TelegramBotEauUsers::all();
-            $clientEau->quantity = $tmp;
-            $clientEau->save();
-            $users = TelegramBotEauUsers::all();
-            foreach ($users as $user) {
-                Longman\TelegramBot\Request::sendMessage([
-                'chat_id' => $user->chat_id,
-                'text' => "Salut! \nNouvelle consommation enregistré de $request->consomation ml, il vous reste  $clientEau->quantity ml"
-                ]);
+            if ($request->consomation > 0) {
+                $users = TelegramBotEauUsers::all();
+                $clientEau->quantity = $tmp;
+                $clientEau->save();
+                $users = TelegramBotEauUsers::all();
+                foreach ($users as $user) {
+                    Longman\TelegramBot\Request::sendMessage([
+                    'chat_id' => $user->chat_id,
+                    'text' => "Salut! \nNouvelle consommation enregistré de $request->consomation ml, il vous reste  $clientEau->quantity ml"
+                    ]);
+                }
             }
         }
         return response($clientEau->quantity);
