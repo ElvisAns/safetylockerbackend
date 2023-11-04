@@ -509,7 +509,8 @@ Route::prefix('eau')->group(function () {
                 ]);
             } else {
                 $clientEau = ClientEau::firstOrCreate(['id' => 1]);
-                preg_match('/\b([0-9]+)\b/', $data['message']['text'], $matches);
+                $d = $data['message']['text'];
+                preg_match('/([0-9]+)/', $d , $matches);
                 $amount = isset($matches[1]) ? (int) $matches[1] : null;
                 if ($amount) {
                     $clientEau->quantity = $clientEau->quantity + ($amount * 1000);
@@ -522,7 +523,7 @@ Route::prefix('eau')->group(function () {
                 } else {
                     Longman\TelegramBot\Request::sendMessage([
                         'chat_id' => $chatId,
-                        'text' => "Salut @$username !, \nVeuillez respecter le format /acheter XXXXlitres"
+                        'text' => "Salut @$username !, \n[$d]Veuillez respecter le format /acheter XXXXlitres"
                     ]);
                 }
             }
