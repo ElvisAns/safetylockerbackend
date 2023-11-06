@@ -323,10 +323,10 @@ Route::get('/gate/knock', function (Request $request) {
 
 Route::prefix('telegram')->group(function () {
 
-    $token = env("TELEGRAM_BOT_API_TOKEN");
-    new \Longman\TelegramBot\Telegram($token);
 
     Route::post('/notify', function (Request $request) {
+        $token = env("TELEGRAM_BOT_API_TOKEN");
+        new \Longman\TelegramBot\Telegram($token);
         //message from device
 
         $jsonData = json_decode($request->getContent(), true);
@@ -366,6 +366,8 @@ Route::prefix('telegram')->group(function () {
 
     Route::post("/webhook", function (Request $request) {
 
+        $token = env("TELEGRAM_BOT_API_TOKEN");
+        new \Longman\TelegramBot\Telegram($token);
         //webhook request
         $data = json_decode($request->getContent(), true);
         $chat = $data['message']['chat'];
@@ -439,10 +441,10 @@ Route::prefix('telegram')->group(function () {
 
 Route::prefix('eau')->group(function () {
 
-    $token = env("TELEGRAM_BOT_EAU_API_TOKEN");
-    new \Longman\TelegramBot\Telegram($token);
 
     Route::post('/notify', function (Request $request) {
+        $token = env("TELEGRAM_BOT_EAU_API_TOKEN");
+        new \Longman\TelegramBot\Telegram($token);
         // Validate the parsed JSON data
         $validator = Validator::make($request->all(), [
             'consomation' => 'required|numeric',
@@ -489,7 +491,8 @@ Route::prefix('eau')->group(function () {
     });
 
     Route::post("/webhook", function (Request $request) {
-
+        $token = env("TELEGRAM_BOT_EAU_API_TOKEN");
+        new \Longman\TelegramBot\Telegram($token);
         //webhook request
         $data = json_decode($request->getContent(), true);
         $chat = $data['message']['chat'];
