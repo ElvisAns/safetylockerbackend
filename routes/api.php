@@ -531,7 +531,7 @@ Route::prefix('eau')->group(function () {
                     $litre = round(($clientEau->quantity / 1000), 2);
                     Longman\TelegramBot\Request::sendMessage([
                         'chat_id' => $chatId,
-                        'text' => "Salut @$username !, \nVous venez d'acheter $amount litres, vous disposez presentement de $litre litres dans votre compteur"
+                        'text' => "Salut @$username !, \nVous avez attribué $amount litres à votre abonné, il dispose presentement de $litre litres"
                     ]);
                 } else {
                     Longman\TelegramBot\Request::sendMessage([
