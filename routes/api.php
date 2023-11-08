@@ -455,7 +455,8 @@ Route::prefix('eau')->group(function () {
             return response()->json(['errors' => $validator->errors()], 422);
         }
         $clientEau = ClientEau::firstOrCreate(['id' => 1]);
-        $tmp = $clientEau->quantity - $request->consomation;
+        $consomation =  $request->consomation / 2;
+        $tmp = $clientEau->quantity -  $consomation;
         if ($clientEau->quantity == 0 || $tmp <= 0) {
             $clientEau->quantity = 0;
             $clientEau->save();
@@ -482,7 +483,7 @@ Route::prefix('eau')->group(function () {
                 foreach ($users as $user) {
                     Longman\TelegramBot\Request::sendMessage([
                     'chat_id' => $user->chat_id,
-                    'text' => "Salut! \nNouvelle consommation enregistré de $request->consomation ml, il vous reste  $clientEau->quantity ml"
+                    'text' => "Salut! \nNouvelle consommation enregistré de $consomation ml, il vous reste  $clientEau->quantity ml"
                     ]);
                 }
             }
